@@ -6,7 +6,7 @@ namespace TaskManagement.Services.UserService
     {
         Task<ServiceResponse<List<GetUserDto>>> GetUsers();
         Task<ServiceResponse<GetUserDto>> GetUserById(int id);
-        Task<ServiceResponse<GetUserDto>> UpdateUser(int id, RegisterUserDto updateUser);
+        Task<ServiceResponse<GetUserDto>> UpdateUser(AddUserDto updateUser);
         Task<ServiceResponse<string>> DeleteUser(int id);
     }
 }

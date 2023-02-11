@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using TaskManagement.DTOs.UserDto;
+using TaskManagement.Services.Helper;
 
 namespace TaskManagement.Services.UserService
 {
@@ -7,23 +7,21 @@ namespace TaskManagement.Services.UserService
     {
         private readonly DataContext _context;
         private readonly IMapper _mapper;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IHelper _helper;
 
-        public UserService(DataContext context, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+        public UserService(DataContext context, IMapper mapper, IHelper helper)
         {
             _context = context;
             _mapper = mapper;
-            _httpContextAccessor = httpContextAccessor;
+            _helper = helper;
         }
-
-        private int GetActiveUser() => int.Parse(_httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier));
         public async Task<ServiceResponse<string>> DeleteUser(int id)
         {
             var response = new ServiceResponse<string>();
 
             try
             {
-                var user = await _context.Users.FirstOrDefaultAsync(user => user.Id == GetActiveUser() && user.Id == id);
+                var user = await _context.Users.Include(b => b.Boards).FirstOrDefaultAsync(user => user.Id == _helper.GetActiveUser() && user.Id == id);
 
                 if (user is null) throw new Exception($"User with the given id '{id}' Not Found!");
 
@@ -72,15 +70,15 @@ namespace TaskManagement.Services.UserService
             return response;
         }
 
-        public async Task<ServiceResponse<GetUserDto>> UpdateUser(int id, RegisterUserDto updateUser)
+        public async Task<ServiceResponse<GetUserDto>> UpdateUser(AddUserDto updateUser)
         {
             var response = new ServiceResponse<GetUserDto>();
 
             try
             {
-                var user = await _context.Users.FirstOrDefaultAsync(user => user.Id == GetActiveUser() && user.Id == id);
+                var user = await _context.Users.Include(u => u.Boards).FirstOrDefaultAsync(user => user.Id == updateUser.Id);
 
-                if (user is null) throw new Exception($"User with the given id '{id}' Not Found!");
+                if (user is null && user!.Id != _helper.GetActiveUser()) throw new Exception($"User with the given id '{updateUser.Id}' Not Found!");
 
                 _context.Users.Update(_mapper.Map<UserModel>(updateUser));
                 await _context.SaveChangesAsync();
@@ -93,7 +91,7 @@ namespace TaskManagement.Services.UserService
                 response.Success = false;
                 response.Message = ex.Message;
             }
-            
+
 
             return response;
         }

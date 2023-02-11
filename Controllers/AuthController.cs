@@ -1,36 +1,34 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using TaskManagement.Services.AuthService;
+﻿using TaskManagement.Services.AuthService;
 
-namespace TaskManagement.Controllers
+namespace TaskManagement.Controllers;
+
+[ApiController]
+[Route("api/v1/[controller]")]
+public class AuthController : ControllerBase
 {
-    [ApiController]
-    [Route("api/v1/[controller]")]
-    public class AuthController : ControllerBase
+    private readonly IAuthService _service;
+
+    public AuthController(IAuthService service)
     {
-        private readonly IAuthService _service;
+        _service = service;
+    }
 
-        public AuthController(IAuthService service)
+    [HttpPost("register")]
+    public async Task<ActionResult<ServiceResponse<string>>> RegisterAsync(RegisterUserDto newUser)
+    {
+        var response = await _service.Register(newUser);
+
+        if (response.Data is null)
         {
-            _service = service;
+            return BadRequest(response);
         }
 
-        [HttpPost("register")]
-        public async Task<ActionResult<ServiceResponse<string>>> RegisterAsync(RegisterUserDto newUser)
-        {
-            var response = await _service.Register(newUser);
+        return Ok(response);
+    }
 
-            if(response.Data is null)
-            {
-                return BadRequest(response);
-            }
-
-            return Ok(response);
-        }
-
-        [HttpPost("login")]
-        public async Task<ActionResult<ServiceResponse<string>>> LoginAsync(LoginUserDto loginUser)
-        {
-            return Ok(await _service.Login(loginUser));
-        }
+    [HttpPost("login")]
+    public async Task<ActionResult<ServiceResponse<string>>> LoginAsync(LoginUserDto loginUser)
+    {
+        return Ok(await _service.Login(loginUser));
     }
 }

@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using TaskManagement.DTOs.UserDto;
 using TaskManagement.Services.UserService;
 
@@ -30,10 +29,10 @@ namespace TaskManagement.Controllers
             return Ok(await _service.GetUserById(id));
         }
 
-        [HttpPut("update/{id:int}")]
-        public async Task<ActionResult<ServiceResponse<GetUserDto>>> UpdateUserAsync(int id, RegisterUserDto updateUser)
+        [HttpPut("update")]
+        public async Task<ActionResult<ServiceResponse<GetUserDto>>> UpdateUserAsync(AddUserDto updateUser)
         {
-            var response = await _service.UpdateUser(id, updateUser);
+            var response = await _service.UpdateUser(updateUser);
 
             if (!response.Success)
             {
@@ -43,7 +42,7 @@ namespace TaskManagement.Controllers
         }
 
         [HttpDelete("delete/{id:int}")]
-        public async Task<ActionResult<ServiceResponse<string>>> DeleteUser(int id)
+        public async Task<ActionResult<ServiceResponse<string>>> DeleteUserAsync(int id)
         {
             var response = await _service.DeleteUser(id);
             if (!response.Success)
