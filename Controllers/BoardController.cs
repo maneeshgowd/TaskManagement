@@ -13,7 +13,7 @@ public class BoardController : ControllerBase
     private readonly IBoardService _boardService;
 
     public BoardController(IBoardService boardService)
-	{
+    {
         _boardService = boardService;
     }
 
@@ -26,7 +26,12 @@ public class BoardController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<ServiceResponse<BoardDto>>> AddBoardAsync(BoardDto board)
     {
-        return Ok(await _boardService.AddBoard(board));
+        var response = await _boardService.AddBoard(board);
+        if (!response.Success)
+        {
+            return BadRequest(response);
+        }
+        return Ok(response);
     }
 
     [HttpGet("{id:int}")]
@@ -45,7 +50,7 @@ public class BoardController : ControllerBase
     {
         var response = await _boardService.UpdateBoard(board);
 
-        if(response is null)
+        if (response is null)
             return NotFound(response);
 
         return Ok(response);

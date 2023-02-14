@@ -20,8 +20,21 @@ namespace TaskManagement.Services.BoardService
         {
             var response = new ServiceResponse<BoardDto>();
 
+            try
+            {
+                var isBoardExists = await _context.Boards.FirstOrDefaultAsync(b => b.Name == board.Name);
+
+                if (isBoardExists is not null)
+                    throw new Exception($"Board with the given name: {board.Name} already exists!");
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+            }
+
             var newBoard = _mapper.Map<Board>(board);
-            newBoard.User =  await _context.Users.FirstOrDefaultAsync(user => user.Id == _helper.GetActiveUser());
+            newBoard.User = await _context.Users.FirstOrDefaultAsync(user => user.Id == _helper.GetActiveUser());
 
             _context.Boards.Add(newBoard);
             await _context.SaveChangesAsync();

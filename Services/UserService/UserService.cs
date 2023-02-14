@@ -76,7 +76,7 @@ namespace TaskManagement.Services.UserService
 
             try
             {
-                var user = await _context.Users.Include(u => u.Boards).FirstOrDefaultAsync(user => user.Id == updateUser.Id);
+                var user = await _context.Users.FirstOrDefaultAsync(user => user.Id == updateUser.Id);
 
                 if (user is null && user!.Id != _helper.GetActiveUser()) throw new Exception($"User with the given id '{updateUser.Id}' Not Found!");
 
@@ -91,7 +91,6 @@ namespace TaskManagement.Services.UserService
                 response.Success = false;
                 response.Message = ex.Message;
             }
-
 
             return response;
         }
