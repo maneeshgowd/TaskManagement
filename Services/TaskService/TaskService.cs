@@ -13,6 +13,11 @@ namespace TaskManagement.Services.TaskService
             _context = context;
             _mapper = mapper;
         }
+
+        /*
+         1. Implement board with columns
+         2. Implement tasks with specific columns
+         */
         public async Task<ServiceResponse<GetTaskDto>> AddTask(AddTaskDto newTask, BoardColumn column)
         {
             var response = new ServiceResponse<GetTaskDto>();
@@ -22,7 +27,7 @@ namespace TaskManagement.Services.TaskService
             {
                 var board = await _context.Columns.FirstOrDefaultAsync(b => b.Name == column.Name);
 
-                if(board is null)
+                if (board is null)
                     throw new Exception($"Invalid Board name: {column.Name}!");
 
                 task.BoardColumn = board;
@@ -36,26 +41,25 @@ namespace TaskManagement.Services.TaskService
                 response.Message = ex.Message;
             }
 
-
-
             return response;
-
         }
 
-        public async Task<ServiceResponse<string>> DeleteTask(int id)
-        {
-            var response = new ServiceResponse<string>();
-            try
-            {
-                var task = await _context.Tasks.Include(t => t.BoardColumn).FirstOrDefaultAsync(task => task.Id == id);
+        //public async Task<ServiceResponse<string>> DeleteTask(int id)
+        //{
+        //    var response = new ServiceResponse<string>();
+        //    try
+        //    {
+        //        var task = await _context.Tasks.Include(t => t.BoardColumn).FirstOrDefaultAsync(task => task.Id == id);
 
-            }
-            catch (Exception ex)
-            {
-                response.Success = false;
-                response.Message = ex.Message;
-            }
-        }
+        //        var user = await _context.Users.FirstOrDefaultAsync(user => user.Id == task.BoardColumn.)
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        response.Success = false;
+        //        response.Message = ex.Message;
+        //    }
+        //}
 
         public async Task<ServiceResponse<GetTaskDto>> GetTaskById(int id)
         {
