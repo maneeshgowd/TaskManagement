@@ -18,48 +18,52 @@ namespace TaskManagement.Services.TaskService
          1. Implement board with columns
          2. Implement tasks with specific columns
          */
-        public async Task<ServiceResponse<GetTaskDto>> AddTask(AddTaskDto newTask, BoardColumn column)
+        public async Task<ServiceResponse<GetTaskDto>> AddTask(AddTaskDto newTask)
         {
-            var response = new ServiceResponse<GetTaskDto>();
-            var task = _mapper.Map<BoardTask>(newTask);
+            //var response = new ServiceResponse<GetTaskDto>();
+            //var task = _mapper.Map<BoardTask>(newTask);
 
-            try
-            {
-                var board = await _context.Columns.FirstOrDefaultAsync(b => b.Name == column.Name);
+            //try
+            //{
+            //    var board = await _context.Columns.FirstOrDefaultAsync(b => b.Name == column.Name);
 
-                if (board is null)
-                    throw new Exception($"Invalid Board name: {column.Name}!");
+            //    if (board is null)
+            //        throw new Exception($"Invalid Board name: {column.Name}!");
 
-                task.BoardColumn = board;
+            //    task.BoardColumn = board;
 
-                await _context.Tasks.AddAsync(_mapper.Map<BoardTask>(newTask));
-                await _context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                response.Success = false;
-                response.Message = ex.Message;
-            }
+            //    await _context.Tasks.AddAsync(_mapper.Map<BoardTask>(newTask));
+            //    await _context.SaveChangesAsync();
+            //}
+            //catch (Exception ex)
+            //{
+            //    response.Success = false;
+            //    response.Message = ex.Message;
+            //}
 
-            return response;
+            throw new NotImplementedException();
         }
 
-        //public async Task<ServiceResponse<string>> DeleteTask(int id)
-        //{
-        //    var response = new ServiceResponse<string>();
-        //    try
-        //    {
-        //        var task = await _context.Tasks.Include(t => t.BoardColumn).FirstOrDefaultAsync(task => task.Id == id);
+        public async Task<ServiceResponse<string>> DeleteTask(int id)
+        {
+            throw new NotImplementedException();
 
-        //        var user = await _context.Users.FirstOrDefaultAsync(user => user.Id == task.BoardColumn.)
+            //var response = new ServiceResponse<string>();
+            //try
+            //{
+            //    var task = await _context.Tasks.Include(t => t.BoardColumn).FirstOrDefaultAsync(task => task.Id == id);
 
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        response.Success = false;
-        //        response.Message = ex.Message;
-        //    }
-        //}
+            //    var user = await _context.Users.FirstOrDefaultAsync(user => user.Id == task.BoardColumn.)
+
+            //}
+            //catch (Exception ex)
+            //{
+            //    response.Success = false;
+            //    response.Message = ex.Message;
+            //}
+
+            //return response;
+        }
 
         public async Task<ServiceResponse<GetTaskDto>> GetTaskById(int id)
         {

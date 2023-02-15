@@ -1,18 +1,15 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using TaskManagement.DTOs.BoardDto;
-using TaskManagement.Services.BoardService;
+﻿using TaskManagement.Services.BoardService;
 
 namespace TaskManagement.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-public class BoardController : ControllerBase
+public class BoardsController : ControllerBase
 {
     private readonly IBoardService _boardService;
 
-    public BoardController(IBoardService boardService)
+    public BoardsController(IBoardService boardService)
     {
         _boardService = boardService;
     }

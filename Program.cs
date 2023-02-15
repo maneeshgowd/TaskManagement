@@ -6,13 +6,19 @@ global using Microsoft.EntityFrameworkCore;
 global using TaskManagement.Services;
 global using Microsoft.AspNetCore.Mvc;
 global using TaskManagement.DTOs.UserDto;
+global using TaskManagement.DTOs.ColumnDto;
+global using Microsoft.AspNetCore.Authorization;
+global using Microsoft.AspNetCore.Authentication.JwtBearer;
+global using TaskManagement.DTOs.BoardDto;
 
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+
 using Microsoft.IdentityModel.Tokens;
 using TaskManagement.Services.AuthService;
 using TaskManagement.Services.UserService;
 using TaskManagement.Services.BoardService;
 using TaskManagement.Services.Helper;
+using TaskManagement.Services.ColumnService;
+using TaskManagement.Services.TaskService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +32,8 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IBoardService,BoardService>();
 builder.Services.AddScoped<IHelper, Helper>();
+builder.Services.AddScoped<IColumnService, ColumnService>();
+builder.Services.AddScoped<ITaskService, TaskService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {

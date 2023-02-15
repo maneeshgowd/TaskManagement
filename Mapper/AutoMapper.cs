@@ -10,15 +10,18 @@ namespace TaskManagement.Mapper
     {
         public AutoMapper()
         {
-            CreateMap<UserModel,GetUserDto>();
-            CreateMap<RegisterUserDto,UserModel>();
-            CreateMap<AddUserDto,UserModel>();
+            CreateMap<UserModel, GetUserDto>();
+            CreateMap<RegisterUserDto, UserModel>();
+            CreateMap<AddUserDto, UserModel>();
             CreateMap<BoardDto, Board>().ReverseMap();
             CreateMap<AddBoardDto, Board>();
-            CreateMap<AddBoardDto,BoardDto>();
+            CreateMap<AddBoardDto, BoardDto>();
             CreateMap<GetTaskDto, BoardTask>().ReverseMap();
-            CreateMap<AddTaskDto,BoardTask>();
+            CreateMap<AddTaskDto, BoardTask>();
             CreateMap<AddTaskDto, GetTaskDto>();
+            CreateMap<BoardColumn, GetColumnDto>();
+            CreateMap<AddColumnDto, BoardColumn>();
+            CreateMap<AddColumnDto, GetColumnDto>();
         }
     }
 }
