@@ -22,24 +22,24 @@ namespace TaskManagement.Services.BoardService
 
             try
             {
-                var isBoardExists = await _context.Boards.FirstOrDefaultAsync(b => b.Name == board.Name);
+                var isBoardExists = await _context.Boards.FirstOrDefaultAsync(b => b.Name.ToLower() == board.Name.ToLower());
 
                 if (isBoardExists is not null)
                     throw new Exception($"Board with the given name: {board.Name} already exists!");
+
+                var newBoard = _mapper.Map<Board>(board);
+                newBoard.User = await _context.Users.FirstOrDefaultAsync(user => user.Id == _helper.GetActiveUser());
+
+                _context.Boards.Add(newBoard);
+                await _context.SaveChangesAsync();
+
+                response.Data = board;
             }
             catch (Exception ex)
             {
                 response.Success = false;
                 response.Message = ex.Message;
             }
-
-            var newBoard = _mapper.Map<Board>(board);
-            newBoard.User = await _context.Users.FirstOrDefaultAsync(user => user.Id == _helper.GetActiveUser());
-
-            _context.Boards.Add(newBoard);
-            await _context.SaveChangesAsync();
-
-            response.Data = board;
 
             return response;
         }
@@ -76,7 +76,7 @@ namespace TaskManagement.Services.BoardService
             var response = new ServiceResponse<BoardDto>();
             try
             {
-                var board = await _context.Boards.FirstOrDefaultAsync(board => board.Id == id && board.User!.Id == _helper.GetActiveUser());
+                var board = await _context.Boards.Include(board => board.Columns).FirstOrDefaultAsync(board => board.Id == id && board.User!.Id == _helper.GetActiveUser());
 
                 if (board is null)
                 {
@@ -98,7 +98,7 @@ namespace TaskManagement.Services.BoardService
         {
             var response = new ServiceResponse<List<BoardDto>>
             {
-                Data = await _context.Boards.Where(board => board.User!.Id == _helper.GetActiveUser())
+                Data = await _context.Boards.Include(board => board.Columns).Where(board => board.User!.Id == _helper.GetActiveUser())
                 .Select(board => _mapper.Map<BoardDto>(board)).ToListAsync(),
             };
             return response;
@@ -109,10 +109,9 @@ namespace TaskManagement.Services.BoardService
             var response = new ServiceResponse<BoardDto>();
             try
             {
-                var board = await _context.Boards.Include(board => board.User)
-                    .FirstOrDefaultAsync(board => board.Id == updateBoard.Id && board.Id == _helper.GetActiveUser());
+                var board = await _context.Boards.FirstOrDefaultAsync(board => board.Id == updateBoard.Id);
 
-                if (updateBoard is null)
+                if (board is null)
                     throw new Exception($"Board with the given id: {updateBoard?.Id} Not Found!");
 
                 _context.Boards.Update(_mapper.Map<Board>(updateBoard));

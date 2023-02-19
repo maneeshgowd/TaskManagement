@@ -25,14 +25,24 @@ namespace TaskManagement.Services.ColumnService
 
             try
             {
-                var isBoard = await _context.Boards.Include(b => b.User).FirstOrDefaultAsync(b => b.Id == newColumn.BoardId && b!.User.Id == _helper.GetActiveUser());
+                var board = await _context.Boards.Include(b => b.User).FirstOrDefaultAsync(b => b.Id == newColumn.BoardId && b.User!.Id == _helper.GetActiveUser());
 
-                if (isBoard is null)
-                    throw new Exception($"Board: {newColumn.BoardId} does not Exists.!");
+                var isColumn = await _context.Columns
+                    .Include(c => c.Board)
+                    .Include(c => c.User)
+                    .SingleOrDefaultAsync(c => c.Name.ToLower() == newColumn.Name.ToLower() && c.Board!.Id == newColumn.BoardId && c.User!.Id == _helper.GetActiveUser());
+                
+
+                if (isColumn is not null)
+                    throw new Exception($"Column: '{isColumn.Name}' alreay exists in the board.");
+
+                if (board is null)
+                    throw new Exception($"Board: '{newColumn.BoardId}' does not Exists.!");
 
                 var column = _mapper.Map<BoardColumn>(newColumn);
 
-                column.Board = isBoard;
+                column.Board = board;
+                column.User = board.User;
 
                 await _context.Columns.AddAsync(column);
                 await _context.SaveChangesAsync();
@@ -48,20 +58,18 @@ namespace TaskManagement.Services.ColumnService
             return response;
         }
 
-        public Task<ServiceResponse<string>> DeleteColumn(int id)
+        public async Task<ServiceResponse<string>> DeleteColumn(int id)
         {
             var response = new ServiceResponse<string>();
             try
             {
-                var isColumn = await _context.Columns.FindAsync(id);
+                var isColumn = await _context.Columns.Include(col => col.User).FirstOrDefaultAsync(col => col.Id == id && col.User!.Id == _helper.GetActiveUser());
 
                 if (isColumn is null)
                     throw new Exception($"Task with the given id: {id} Not Found!");
 
-                await _context.Columns.Remove(isColumn);
+                _context.Columns.Remove(isColumn);
                 await _context.SaveChangesAsync();
-
-                response.Data = _mapper.Map<GetColumnDto>(updateColumn);
             }
             catch (Exception ex)
             {
@@ -76,7 +84,8 @@ namespace TaskManagement.Services.ColumnService
         {
             var response = new ServiceResponse<List<GetColumnDto>>
             {
-                Data = await _context.Columns.Select(c => _mapper.Map<GetColumnDto>(c)).ToListAsync(),
+                Data = await _context.Columns.Where(col => col.User!.Id == _helper.GetActiveUser())
+                .Select(col => _mapper.Map<GetColumnDto>(col)).ToListAsync(),
             };
 
             return response;
@@ -89,7 +98,7 @@ namespace TaskManagement.Services.ColumnService
             try
             {
 
-                var column = await _context.Columns.SingleOrDefaultAsync(c => c.Equals(id));
+                var column = await _context.Columns.SingleOrDefaultAsync(c => c.Id.Equals(id) && c.User!.Id == _helper.GetActiveUser());
 
                 if (column is null)
                     throw new Exception($"Column with the specified id: {id}, Not Found!");
@@ -112,7 +121,7 @@ namespace TaskManagement.Services.ColumnService
             var response = new ServiceResponse<GetColumnDto>();
             try
             {
-                var isBoard = await _context.Boards.Include(b => b.User).FirstOrDefaultAsync(b => b.Id == updateColumn.BoardId && b!.User.Id == _helper.GetActiveUser());
+                var isBoard = await _context.Boards.Include(b => b.User).FirstOrDefaultAsync(b => b.Id == updateColumn.BoardId && b.User!.Id == _helper.GetActiveUser());
 
                 var isColumn = await _context.Columns.FindAsync(id);
 
@@ -121,10 +130,11 @@ namespace TaskManagement.Services.ColumnService
                     throw new Exception($"Board: {updateColumn.BoardId} does not Exists.!");
 
                 if (isColumn is null)
-                    throw new Exception($"Task with the given id: {id} Not Found!");
+                    throw new Exception($"Column with the given id: {id} Not Found!");
 
                 var column = _mapper.Map<BoardColumn>(updateColumn);
                 column.Board = isBoard;
+                column.Id = id;
 
                 _context.Columns.Update(column);
                 await _context.SaveChangesAsync();

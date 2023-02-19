@@ -12,5 +12,7 @@
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public bool IsActive { get; set; } = true;
         public List<Board>? Boards { get; set; }
+        public List<BoardColumn>? BoardsColumn { get; set; }
+        public List<BoardTask>? BoardsTask { get; set; }
     }
 }

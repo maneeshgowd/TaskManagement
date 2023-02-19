@@ -59,9 +59,14 @@ namespace TaskManagement.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("BoardId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Columns");
                 });
@@ -77,6 +82,9 @@ namespace TaskManagement.Migrations
                     b.Property<int?>("BoardColumnId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("BoardId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -85,9 +93,16 @@ namespace TaskManagement.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("BoardColumnId");
+
+                    b.HasIndex("BoardId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Tasks");
                 });
@@ -171,7 +186,13 @@ namespace TaskManagement.Migrations
                         .WithMany("Columns")
                         .HasForeignKey("BoardId");
 
+                    b.HasOne("TaskManagement.Models.UserModel", "User")
+                        .WithMany("BoardsColumn")
+                        .HasForeignKey("UserId");
+
                     b.Navigation("Board");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TaskManagement.Models.BoardTask", b =>
@@ -180,7 +201,19 @@ namespace TaskManagement.Migrations
                         .WithMany("Tasks")
                         .HasForeignKey("BoardColumnId");
 
+                    b.HasOne("TaskManagement.Models.Board", "Board")
+                        .WithMany("Tasks")
+                        .HasForeignKey("BoardId");
+
+                    b.HasOne("TaskManagement.Models.UserModel", "User")
+                        .WithMany("BoardsTask")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Board");
+
                     b.Navigation("BoardColumn");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TaskManagement.Models.SubTask", b =>
@@ -195,6 +228,8 @@ namespace TaskManagement.Migrations
             modelBuilder.Entity("TaskManagement.Models.Board", b =>
                 {
                     b.Navigation("Columns");
+
+                    b.Navigation("Tasks");
                 });
 
             modelBuilder.Entity("TaskManagement.Models.BoardColumn", b =>
@@ -210,6 +245,10 @@ namespace TaskManagement.Migrations
             modelBuilder.Entity("TaskManagement.Models.UserModel", b =>
                 {
                     b.Navigation("Boards");
+
+                    b.Navigation("BoardsColumn");
+
+                    b.Navigation("BoardsTask");
                 });
 #pragma warning restore 612, 618
         }

@@ -33,7 +33,7 @@ namespace TaskManagement.Controllers
             return Ok(response);
         }
 
-        [HttpGet("{id:int")]
+        [HttpGet("{id:int}")]
         public async Task<ActionResult<ServiceResponse<GetColumnDto>>> GetColumnAsync(int id)
         {
             var response = await _service.GetColumn(id);
@@ -46,7 +46,7 @@ namespace TaskManagement.Controllers
             return Ok(response);
         }
 
-        [HttpPut("update/{id:int")]
+        [HttpPut("update/{id:int}")]
         public async Task<ActionResult<ServiceResponse<GetColumnDto>>> UpdateColumnAsync(AddColumnDto updateColumn, int id)
         {
             var response = await _service.UpdateColumn(updateColumn, id);
@@ -59,7 +59,7 @@ namespace TaskManagement.Controllers
             return Ok(response);
         }
 
-        [HttpDelete("delete/{id:int")]
+        [HttpDelete("delete/{id:int}")]
         public async Task<ActionResult<ServiceResponse<GetColumnDto>>> DeleteColumnAsync(int id)
         {
             var response = await _service.DeleteColumn(id);

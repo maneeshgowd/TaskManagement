@@ -1,5 +1,8 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using TaskManagement.DTOs.TaskDto;
+using TaskManagement.Models;
+using TaskManagement.Services.Helper;
 
 namespace TaskManagement.Services.TaskService
 {
@@ -7,62 +10,83 @@ namespace TaskManagement.Services.TaskService
     {
         private readonly DataContext _context;
         private readonly IMapper _mapper;
+        private readonly IHelper _helper;
 
-        public TaskService(DataContext context, IMapper mapper)
+        public TaskService(DataContext context, IMapper mapper, IHelper helper)
         {
             _context = context;
             _mapper = mapper;
+            _helper = helper;
         }
 
-        /*
-         1. Implement board with columns
-         2. Implement tasks with specific columns
-         */
         public async Task<ServiceResponse<GetTaskDto>> AddTask(AddTaskDto newTask)
         {
-            //var response = new ServiceResponse<GetTaskDto>();
-            //var task = _mapper.Map<BoardTask>(newTask);
+            var response = new ServiceResponse<GetTaskDto>();
 
-            //try
-            //{
-            //    var board = await _context.Columns.FirstOrDefaultAsync(b => b.Name == column.Name);
+            try
+            {
+                var isBoard = await _context.Boards.Include(b => b.User)
+                    .FirstOrDefaultAsync(b => b.Id == newTask.BoardId && b.User!.Id == _helper.GetActiveUser());
 
-            //    if (board is null)
-            //        throw new Exception($"Invalid Board name: {column.Name}!");
+                var isColumn = await _context.Columns.Include(col => col.User)
+                    .SingleOrDefaultAsync(col => col.Id == newTask.ColumnId && col.User!.Id == _helper.GetActiveUser());
 
-            //    task.BoardColumn = board;
+                var isTask = await _context.Tasks
+                    .Include(task => task.Board)
+                    .Include(task => task.User)
+                    .SingleOrDefaultAsync(task => task.Title.ToLower() == newTask.Title.ToLower()
+                                                  && task.User!.Id == _helper.GetActiveUser() && task.Board!.Id == newTask.BoardId);
 
-            //    await _context.Tasks.AddAsync(_mapper.Map<BoardTask>(newTask));
-            //    await _context.SaveChangesAsync();
-            //}
-            //catch (Exception ex)
-            //{
-            //    response.Success = false;
-            //    response.Message = ex.Message;
-            //}
+                if (isColumn is null)
+                    throw new Exception($"Column with the given id:'{newTask.ColumnId}' Not Found!");
 
-            throw new NotImplementedException();
+                if (isTask is not null)
+                    throw new Exception($"Task with the given Title:'{newTask.Title}' already exists!");
+
+                if (isBoard is null)
+                    throw new Exception($"Board: '{newTask.BoardId}' does not Exists.!");
+
+                var task = _mapper.Map<BoardTask>(newTask);
+
+                task.BoardColumn = isColumn;
+                task.Board = isBoard;
+                task.User = await _context.Users.FindAsync(_helper.GetActiveUser());
+
+                await _context.Tasks.AddAsync(_mapper.Map<BoardTask>(newTask));
+                await _context.SaveChangesAsync();
+
+                response.Data = _mapper.Map<GetTaskDto>(task);
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+            }
+
+            return response;
         }
 
         public async Task<ServiceResponse<string>> DeleteTask(int id)
         {
-            throw new NotImplementedException();
+            var response = new ServiceResponse<string>();
+            try
+            {
+                var task = await _context.Tasks.Include(task => task.User).FirstOrDefaultAsync(task => task.Id == id && task.User!.Id == _helper.GetActiveUser());
 
-            //var response = new ServiceResponse<string>();
-            //try
-            //{
-            //    var task = await _context.Tasks.Include(t => t.BoardColumn).FirstOrDefaultAsync(task => task.Id == id);
+                if (task is null)
+                    throw new Exception($"Task with the given id:'{id}' Not Found!");
 
-            //    var user = await _context.Users.FirstOrDefaultAsync(user => user.Id == task.BoardColumn.)
+                _context.Tasks.Remove(task);
+                await _context.SaveChangesAsync();
 
-            //}
-            //catch (Exception ex)
-            //{
-            //    response.Success = false;
-            //    response.Message = ex.Message;
-            //}
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+            }
 
-            //return response;
+            return response;
         }
 
         public async Task<ServiceResponse<GetTaskDto>> GetTaskById(int id)
@@ -70,7 +94,7 @@ namespace TaskManagement.Services.TaskService
             var response = new ServiceResponse<GetTaskDto>();
             try
             {
-                var task = await _context.Tasks.FirstOrDefaultAsync(task => task.Id == id);
+                var task = await _context.Tasks.Include(task => task.User).FirstOrDefaultAsync(task => task.Id == id && task.User!.Id == _helper.GetActiveUser());
 
                 if (task is null)
                     throw new Exception($"Task with the given id: {id}, Not Found!");
@@ -90,7 +114,9 @@ namespace TaskManagement.Services.TaskService
         {
             var response = new ServiceResponse<List<GetTaskDto>>
             {
-                Data = await _context.Tasks.Include(task => task.SubTasks).Select(task => _mapper.Map<GetTaskDto>(task)).ToListAsync(),
+                Data = await _context.Tasks.Include(task => task.User)
+                                           .Where(task => task.User!.Id == _helper.GetActiveUser())
+                                           .Select(task => _mapper.Map<GetTaskDto>(task)).ToListAsync(),
             };
 
             return response;
