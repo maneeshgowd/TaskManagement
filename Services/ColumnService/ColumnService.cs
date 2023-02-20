@@ -84,7 +84,7 @@ namespace TaskManagement.Services.ColumnService
         {
             var response = new ServiceResponse<List<GetColumnDto>>
             {
-                Data = await _context.Columns.Where(col => col.User!.Id == _helper.GetActiveUser())
+                Data = await _context.Columns.Include(col => col.Tasks).Where(col => col.User!.Id == _helper.GetActiveUser())
                 .Select(col => _mapper.Map<GetColumnDto>(col)).ToListAsync(),
             };
 
@@ -98,7 +98,8 @@ namespace TaskManagement.Services.ColumnService
             try
             {
 
-                var column = await _context.Columns.SingleOrDefaultAsync(c => c.Id.Equals(id) && c.User!.Id == _helper.GetActiveUser());
+                var column = await _context.Columns.Include(col => col.Tasks)
+                                                   .SingleOrDefaultAsync(c => c.Id.Equals(id) && c.User!.Id == _helper.GetActiveUser());
 
                 if (column is null)
                     throw new Exception($"Column with the specified id: {id}, Not Found!");

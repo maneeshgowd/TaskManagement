@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TaskManagement.Data;
 
@@ -11,9 +12,11 @@ using TaskManagement.Data;
 namespace TaskManagement.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230220134525_ChangedAttributeName")]
+    partial class ChangedAttributeName
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -115,12 +118,6 @@ namespace TaskManagement.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("BoardId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ColumnId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -128,18 +125,9 @@ namespace TaskManagement.Migrations
                     b.Property<int?>("TaskId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("BoardId");
-
-                    b.HasIndex("ColumnId");
-
                     b.HasIndex("TaskId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("SubTasks");
                 });
@@ -233,44 +221,22 @@ namespace TaskManagement.Migrations
 
             modelBuilder.Entity("TaskManagement.Models.SubTask", b =>
                 {
-                    b.HasOne("TaskManagement.Models.Board", "Board")
-                        .WithMany("SubTasks")
-                        .HasForeignKey("BoardId");
-
-                    b.HasOne("TaskManagement.Models.BoardColumn", "Column")
-                        .WithMany("SubTasks")
-                        .HasForeignKey("ColumnId");
-
                     b.HasOne("TaskManagement.Models.BoardTask", "Task")
                         .WithMany("SubTasks")
                         .HasForeignKey("TaskId");
 
-                    b.HasOne("TaskManagement.Models.UserModel", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("Board");
-
-                    b.Navigation("Column");
-
                     b.Navigation("Task");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TaskManagement.Models.Board", b =>
                 {
                     b.Navigation("Columns");
 
-                    b.Navigation("SubTasks");
-
                     b.Navigation("Tasks");
                 });
 
             modelBuilder.Entity("TaskManagement.Models.BoardColumn", b =>
                 {
-                    b.Navigation("SubTasks");
-
                     b.Navigation("Tasks");
                 });
 

@@ -48,11 +48,11 @@ namespace TaskManagement.Services.TaskService
 
                 var task = _mapper.Map<BoardTask>(newTask);
 
-                task.BoardColumn = isColumn;
+                task.Column = isColumn;
                 task.Board = isBoard;
                 task.User = await _context.Users.FindAsync(_helper.GetActiveUser());
 
-                await _context.Tasks.AddAsync(_mapper.Map<BoardTask>(newTask));
+                await _context.Tasks.AddAsync(task);
                 await _context.SaveChangesAsync();
 
                 response.Data = _mapper.Map<GetTaskDto>(task);

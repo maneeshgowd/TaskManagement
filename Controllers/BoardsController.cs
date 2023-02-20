@@ -15,13 +15,13 @@ public class BoardsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<ServiceResponse<List<BoardDto>>>> GetBoardsAsync()
+    public async Task<ActionResult<ServiceResponse<List<GetBoardDto>>>> GetBoardsAsync()
     {
         return Ok(await _boardService.GetBoards());
     }
 
     [HttpPost]
-    public async Task<ActionResult<ServiceResponse<BoardDto>>> AddBoardAsync(BoardDto board)
+    public async Task<ActionResult<ServiceResponse<GetBoardDto>>> AddBoardAsync(AddBoardDto board)
     {
         var response = await _boardService.AddBoard(board);
         if (!response.Success)
@@ -32,7 +32,7 @@ public class BoardsController : ControllerBase
     }
 
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<ServiceResponse<BoardDto>>> GetBoardAsync(int id)
+    public async Task<ActionResult<ServiceResponse<GetBoardDto>>> GetBoardAsync(int id)
     {
         var response = await _boardService.GetBoard(id);
 
@@ -42,10 +42,10 @@ public class BoardsController : ControllerBase
         return Ok(response);
     }
 
-    [HttpPut("update")]
-    public async Task<ActionResult<ServiceResponse<BoardDto>>> UpdateBoardAsync(AddBoardDto board)
+    [HttpPut("update/{id:int}")]
+    public async Task<ActionResult<ServiceResponse<GetBoardDto>>> UpdateBoardAsync(AddBoardDto board, int id)
     {
-        var response = await _boardService.UpdateBoard(board);
+        var response = await _boardService.UpdateBoard(board, id);
 
         if (response is null)
             return NotFound(response);
@@ -54,7 +54,7 @@ public class BoardsController : ControllerBase
     }
 
     [HttpDelete("delete/{id:int}")]
-    public async Task<ActionResult<ServiceResponse<BoardDto>>> DeleteBoardAsync(int id)
+    public async Task<ActionResult<ServiceResponse<GetBoardDto>>> DeleteBoardAsync(int id)
     {
         var response = await _boardService.DeleteBoard(id);
 

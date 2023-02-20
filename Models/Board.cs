@@ -6,6 +6,7 @@
         public string Name { get; set; } = string.Empty;
         public List<BoardColumn>? Columns { get; set; }
         public List<BoardTask>? Tasks { get; set; }
+        public List<SubTask>? SubTasks { get; set; }
         public UserModel? User { get; set; }
     }
 }

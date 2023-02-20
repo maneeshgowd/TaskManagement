@@ -1,8 +1,7 @@
-﻿namespace TaskManagement.Models
+﻿namespace TaskManagement.DTOs.SubTaskDto
 {
-    public class SubTask
+    public class AddSubTaskDto
     {
-        public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public Board? Board { get; set; }
         public BoardColumn? Column { get; set; }

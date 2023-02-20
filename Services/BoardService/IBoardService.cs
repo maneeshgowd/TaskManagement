@@ -4,10 +4,10 @@ namespace TaskManagement.Services.BoardService
 {
     public interface IBoardService
     {
-        Task<ServiceResponse<List<BoardDto>>> GetBoards();
-        Task<ServiceResponse<BoardDto>> GetBoard(int id);
-        Task<ServiceResponse<BoardDto>> UpdateBoard(AddBoardDto board);
+        Task<ServiceResponse<List<GetBoardDto>>> GetBoards();
+        Task<ServiceResponse<GetBoardDto>> GetBoard(int id);
+        Task<ServiceResponse<GetBoardDto>> UpdateBoard(AddBoardDto board, int id);
         Task<ServiceResponse<string>> DeleteBoard(int id);
-        Task<ServiceResponse<BoardDto>> AddBoard(BoardDto board);
+        Task<ServiceResponse<GetBoardDto>> AddBoard(AddBoardDto board);
     }
 }

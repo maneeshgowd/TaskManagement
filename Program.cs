@@ -30,10 +30,11 @@ builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IBoardService,BoardService>();
+builder.Services.AddScoped<IBoardService, BoardService>();
 builder.Services.AddScoped<IHelper, Helper>();
 builder.Services.AddScoped<IColumnService, ColumnService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
+builder.Services.AddScoped<ISubTaskService, SubTaskService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {

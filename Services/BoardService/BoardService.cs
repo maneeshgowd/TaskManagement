@@ -16,9 +16,9 @@ namespace TaskManagement.Services.BoardService
             _mapper = mapper;
             _helper = helper;
         }
-        public async Task<ServiceResponse<BoardDto>> AddBoard(BoardDto board)
+        public async Task<ServiceResponse<GetBoardDto>> AddBoard(AddBoardDto board)
         {
-            var response = new ServiceResponse<BoardDto>();
+            var response = new ServiceResponse<GetBoardDto>();
 
             try
             {
@@ -33,7 +33,7 @@ namespace TaskManagement.Services.BoardService
                 _context.Boards.Add(newBoard);
                 await _context.SaveChangesAsync();
 
-                response.Data = board;
+                response.Data = _mapper.Map<GetBoardDto>(board);
             }
             catch (Exception ex)
             {
@@ -71,19 +71,20 @@ namespace TaskManagement.Services.BoardService
 
         }
 
-        public async Task<ServiceResponse<BoardDto>> GetBoard(int id)
+        public async Task<ServiceResponse<GetBoardDto>> GetBoard(int id)
         {
-            var response = new ServiceResponse<BoardDto>();
+            var response = new ServiceResponse<GetBoardDto>();
             try
             {
-                var board = await _context.Boards.Include(board => board.Columns).FirstOrDefaultAsync(board => board.Id == id && board.User!.Id == _helper.GetActiveUser());
+                var board = await _context.Boards.Include(board => board.Columns).Include(board => board.Tasks)
+                    .FirstOrDefaultAsync(board => board.Id == id && board.User!.Id == _helper.GetActiveUser());
 
                 if (board is null)
                 {
                     throw new Exception($"Board with the given id: {id} Not Found!");
                 }
 
-                response.Data = _mapper.Map<BoardDto>(board);
+                response.Data = _mapper.Map<GetBoardDto>(board);
             }
             catch (Exception ex)
             {
@@ -94,30 +95,31 @@ namespace TaskManagement.Services.BoardService
             return response;
         }
 
-        public async Task<ServiceResponse<List<BoardDto>>> GetBoards()
+        public async Task<ServiceResponse<List<GetBoardDto>>> GetBoards()
         {
-            var response = new ServiceResponse<List<BoardDto>>
+            var response = new ServiceResponse<List<GetBoardDto>>
             {
-                Data = await _context.Boards.Include(board => board.Columns).Where(board => board.User!.Id == _helper.GetActiveUser())
-                .Select(board => _mapper.Map<BoardDto>(board)).ToListAsync(),
+                Data = await _context.Boards.Include(board => board.Columns).Include(board => board.Tasks)
+                .Where(board => board.User!.Id == _helper.GetActiveUser())
+                .Select(board => _mapper.Map<GetBoardDto>(board)).ToListAsync(),
             };
             return response;
         }
 
-        public async Task<ServiceResponse<BoardDto>> UpdateBoard(AddBoardDto updateBoard)
+        public async Task<ServiceResponse<GetBoardDto>> UpdateBoard(AddBoardDto updateBoard, int id)
         {
-            var response = new ServiceResponse<BoardDto>();
+            var response = new ServiceResponse<GetBoardDto>();
             try
             {
-                var board = await _context.Boards.FirstOrDefaultAsync(board => board.Id == updateBoard.Id);
+                var board = await _context.Boards.FirstOrDefaultAsync(board => board.Id == id);
 
                 if (board is null)
-                    throw new Exception($"Board with the given id: {updateBoard?.Id} Not Found!");
+                    throw new Exception($"Board with the given id: {id} Not Found!");
 
                 _context.Boards.Update(_mapper.Map<Board>(updateBoard));
                 await _context.SaveChangesAsync();
 
-                response.Data = _mapper.Map<BoardDto>(updateBoard);
+                response.Data = _mapper.Map<GetBoardDto>(updateBoard);
 
             }
             catch (Exception ex)

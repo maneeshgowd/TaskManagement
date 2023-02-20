@@ -14,5 +14,6 @@
         public List<Board>? Boards { get; set; }
         public List<BoardColumn>? BoardsColumn { get; set; }
         public List<BoardTask>? BoardsTask { get; set; }
+        public List<SubTask>? SubTasks { get; set; }
     }
 }
