@@ -10,13 +10,15 @@ global using TaskManagement.DTOs.ColumnDto;
 global using Microsoft.AspNetCore.Authorization;
 global using Microsoft.AspNetCore.Authentication.JwtBearer;
 global using TaskManagement.DTOs.BoardDto;
+global using TaskManagement.DTOs.SubTaskDto;
+global using TaskManagement.DTOs.TaskDto;
+global using TaskManagement.Services.Helper;
 
 
 using Microsoft.IdentityModel.Tokens;
 using TaskManagement.Services.AuthService;
 using TaskManagement.Services.UserService;
 using TaskManagement.Services.BoardService;
-using TaskManagement.Services.Helper;
 using TaskManagement.Services.ColumnService;
 using TaskManagement.Services.TaskService;
 

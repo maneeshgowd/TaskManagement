@@ -1,9 +1,4 @@
 ﻿using AutoMapper;
-using TaskManagement.DTOs.BoardDto;
-using TaskManagement.DTOs.SubTaskDto;
-using TaskManagement.DTOs.TaskDto;
-using TaskManagement.DTOs.UserDto;
-using TaskManagement.Models;
 
 namespace TaskManagement.Mapper
 {

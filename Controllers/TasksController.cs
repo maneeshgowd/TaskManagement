@@ -1,5 +1,4 @@
-﻿using TaskManagement.DTOs.TaskDto;
-using TaskManagement.Services.TaskService;
+﻿using TaskManagement.Services.TaskService;
 
 namespace TaskManagement.Controllers
 {

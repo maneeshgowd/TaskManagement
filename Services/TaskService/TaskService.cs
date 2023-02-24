@@ -1,8 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using TaskManagement.DTOs.TaskDto;
-using TaskManagement.Models;
-using TaskManagement.Services.Helper;
 
 namespace TaskManagement.Services.TaskService
 {
@@ -71,7 +67,8 @@ namespace TaskManagement.Services.TaskService
             var response = new ServiceResponse<string>();
             try
             {
-                var task = await _context.Tasks.Include(task => task.User).FirstOrDefaultAsync(task => task.Id == id && task.User!.Id == _helper.GetActiveUser());
+                var task = await _context.Tasks.Include(task => task.User)
+                                               .FirstOrDefaultAsync(task => task.Id == id && task.User!.Id == _helper.GetActiveUser());
 
                 if (task is null)
                     throw new Exception($"Task with the given id:'{id}' Not Found!");
@@ -94,7 +91,8 @@ namespace TaskManagement.Services.TaskService
             var response = new ServiceResponse<GetTaskDto>();
             try
             {
-                var task = await _context.Tasks.Include(task => task.User).FirstOrDefaultAsync(task => task.Id == id && task.User!.Id == _helper.GetActiveUser());
+                var task = await _context.Tasks.Include(task => task.User)
+                                               .FirstOrDefaultAsync(task => task.Id == id && task.User!.Id == _helper.GetActiveUser());
 
                 if (task is null)
                     throw new Exception($"Task with the given id: {id}, Not Found!");
@@ -114,7 +112,7 @@ namespace TaskManagement.Services.TaskService
         {
             var response = new ServiceResponse<List<GetTaskDto>>
             {
-                Data = await _context.Tasks.Include(task => task.User)
+                Data = await _context.Tasks.Include(task => task.SubTasks)
                                            .Where(task => task.User!.Id == _helper.GetActiveUser())
                                            .Select(task => _mapper.Map<GetTaskDto>(task)).ToListAsync(),
             };

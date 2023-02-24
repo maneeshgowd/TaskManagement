@@ -1,9 +1,4 @@
 ﻿using AutoMapper;
-using Azure;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using System.Linq;
-using TaskManagement.DTOs.ColumnDto;
-using TaskManagement.Services.Helper;
 
 namespace TaskManagement.Services.ColumnService
 {
