@@ -17,13 +17,13 @@ namespace TaskManagement.Controllers
 
 
         [HttpGet]
-        public async Task<ActionResult<ServiceResponse<List<GetTaskDto>>>> GetTaskAsync()
+        public async Task<ActionResult<ServiceResponse<List<GetSubTaskDto>>>> GetTaskAsync()
         {
             return Ok(await _service.GetSubTasks());
         }
 
         [HttpPost]
-        public async Task<ActionResult<ServiceResponse<GetTaskDto>>> AddTaskAsync(AddSubTaskDto newSubTask)
+        public async Task<ActionResult<ServiceResponse<GetSubTaskDto>>> AddTaskAsync(AddSubTaskDto newSubTask)
         {
             var response = await _service.AddSubTask(newSubTask);
 
@@ -36,7 +36,7 @@ namespace TaskManagement.Controllers
         }
 
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<ServiceResponse<GetTaskDto>>> GetTaskAsync(int id)
+        public async Task<ActionResult<ServiceResponse<GetSubTaskDto>>> GetTaskAsync(int id)
         {
             var response = await _service.GetSubTaskById(id);
 
@@ -49,7 +49,7 @@ namespace TaskManagement.Controllers
         }
 
         [HttpPut("update/{id:int}")]
-        public async Task<ActionResult<ServiceResponse<GetTaskDto>>> UpdateTaskAsync(AddSubTaskDto updateSubTask, int id)
+        public async Task<ActionResult<ServiceResponse<GetSubTaskDto>>> UpdateTaskAsync(AddSubTaskDto updateSubTask, int id)
         {
             var response = await _service.UpdateSubTask(updateSubTask, id);
 
@@ -62,7 +62,7 @@ namespace TaskManagement.Controllers
         }
 
         [HttpDelete("delete/{id:int}")]
-        public async Task<ActionResult<ServiceResponse<GetTaskDto>>> DeleteTaskAsync(int id)
+        public async Task<ActionResult<ServiceResponse<GetSubTaskDto>>> DeleteTaskAsync(int id)
         {
             var response = await _service.DeleteSubTask(id);
 

@@ -63,8 +63,7 @@ namespace TaskManagement.Services.TaskService
             }
             catch (Exception ex)
             {
-                response.Success = false;
-                response.Message = ex.Message;
+                _helper.SetHttpErrorResponse(response, ex.Message);
             }
 
             return response;
@@ -87,8 +86,7 @@ namespace TaskManagement.Services.TaskService
             }
             catch (Exception ex)
             {
-                response.Success = false;
-                response.Message = ex.Message;
+                _helper.SetHttpErrorResponse(response, ex.Message);
             }
 
             return response;
@@ -110,16 +108,44 @@ namespace TaskManagement.Services.TaskService
             }
             catch (Exception ex)
             {
-                response.Success = false;
-                response.Message = ex.Message;
+                _helper.SetHttpErrorResponse(response, ex.Message);
             }
 
             return response;
         }
 
-        public Task<ServiceResponse<GetSubTaskDto>> UpdateSubTask(AddSubTaskDto updateSubTask, int id)
+        public async Task<ServiceResponse<GetSubTaskDto>> UpdateSubTask(AddSubTaskDto updateSubTask, int id)
         {
-            throw new NotImplementedException();
+            var response = new ServiceResponse<GetSubTaskDto>();
+
+            try
+            {
+                var subtask = await _context.SubTasks
+                                               .Include(stask => stask.User)
+                                               .Include(stask => stask.Board)
+                                               .Include(stask => stask.Column)
+                                               .Include(stask => stask.Task)
+                                               .FirstOrDefaultAsync(stask => stask.User!.Id == _helper.GetActiveUser() && stask.Id == id);
+
+                if (subtask is null)
+                    throw new Exception($"Task with the given id: {id} Not Found!");
+
+                var updatedSubTask = _mapper.Map<SubTask>(updateSubTask);
+                updatedSubTask.Board = subtask.Board;
+                updatedSubTask.Column = subtask.Column;
+                updatedSubTask.Task= subtask.Task;
+
+                _context.SubTasks.Update(updatedSubTask);
+                await _context.SaveChangesAsync();
+
+                response.Data = _mapper.Map<GetSubTaskDto>(updatedSubTask);
+            }
+            catch (Exception ex)
+            {
+                _helper.SetHttpErrorResponse(response, ex.Message);
+            }
+
+            return response;
 
         }
 

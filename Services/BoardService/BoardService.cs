@@ -35,8 +35,7 @@ namespace TaskManagement.Services.BoardService
             }
             catch (Exception ex)
             {
-                response.Success = false;
-                response.Message = ex.Message;
+                _helper.SetHttpErrorResponse(response, ex.Message);
             }
 
             return response;
@@ -61,8 +60,7 @@ namespace TaskManagement.Services.BoardService
             }
             catch (Exception ex)
             {
-                response.Success = false;
-                response.Message = ex.Message;
+                _helper.SetHttpErrorResponse(response, ex.Message);
             }
 
             return response;
@@ -72,10 +70,12 @@ namespace TaskManagement.Services.BoardService
         public async Task<ServiceResponse<GetBoardDto>> GetBoard(int id)
         {
             var response = new ServiceResponse<GetBoardDto>();
+
             try
             {
-                var board = await _context.Boards.Include(board => board.Columns).Include(board => board.Tasks)
-                    .FirstOrDefaultAsync(board => board.Id == id && board.User!.Id == _helper.GetActiveUser());
+                var board = await _context.Boards.Include(board => board.Columns)
+                                                 .Include(board => board.Tasks)
+                                                 .FirstOrDefaultAsync(board => board.Id == id && board.User!.Id == _helper.GetActiveUser());
 
                 if (board is null)
                 {
@@ -86,8 +86,7 @@ namespace TaskManagement.Services.BoardService
             }
             catch (Exception ex)
             {
-                response.Success = false;
-                response.Message = ex.Message;
+                _helper.SetHttpErrorResponse(response, ex.Message);
             }
 
             return response;
@@ -97,9 +96,11 @@ namespace TaskManagement.Services.BoardService
         {
             var response = new ServiceResponse<List<GetBoardDto>>
             {
-                Data = await _context.Boards.Include(board => board.Columns).Include(board => board.Tasks)
-                .Where(board => board.User!.Id == _helper.GetActiveUser())
-                .Select(board => _mapper.Map<GetBoardDto>(board)).ToListAsync(),
+                Data = await _context.Boards.Include(board => board.Columns)
+                                            .Include(board => board.Tasks)
+                                            .Include(board => board.SubTasks)
+                                            .Where(board => board.User!.Id == _helper.GetActiveUser())
+                                            .Select(board => _mapper.Map<GetBoardDto>(board)).ToListAsync(),
             };
             return response;
         }
@@ -122,8 +123,7 @@ namespace TaskManagement.Services.BoardService
             }
             catch (Exception ex)
             {
-                response.Message = ex.Message;
-                response.Success = false;
+                _helper.SetHttpErrorResponse(response, ex.Message);
             }
 
             return response;

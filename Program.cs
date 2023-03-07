@@ -21,6 +21,7 @@ using TaskManagement.Services.UserService;
 using TaskManagement.Services.BoardService;
 using TaskManagement.Services.ColumnService;
 using TaskManagement.Services.TaskService;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 

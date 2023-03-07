@@ -55,8 +55,7 @@ namespace TaskManagement.Services.TaskService
             }
             catch (Exception ex)
             {
-                response.Success = false;
-                response.Message = ex.Message;
+                _helper.SetHttpErrorResponse(response, ex.Message);
             }
 
             return response;
@@ -79,8 +78,7 @@ namespace TaskManagement.Services.TaskService
             }
             catch (Exception ex)
             {
-                response.Success = false;
-                response.Message = ex.Message;
+                _helper.SetHttpErrorResponse(response, ex.Message);
             }
 
             return response;
@@ -91,7 +89,7 @@ namespace TaskManagement.Services.TaskService
             var response = new ServiceResponse<GetTaskDto>();
             try
             {
-                var task = await _context.Tasks.Include(task => task.User)
+                var task = await _context.Tasks.Include(task => task.User).Include(task => task.SubTasks)
                                                .FirstOrDefaultAsync(task => task.Id == id && task.User!.Id == _helper.GetActiveUser());
 
                 if (task is null)
@@ -101,8 +99,7 @@ namespace TaskManagement.Services.TaskService
             }
             catch (Exception ex)
             {
-                response.Success = false;
-                response.Message = ex.Message;
+                _helper.SetHttpErrorResponse(response, ex.Message);
             }
 
             return response;
@@ -120,9 +117,35 @@ namespace TaskManagement.Services.TaskService
             return response;
         }
 
-        public Task<ServiceResponse<GetTaskDto>> UpdateTask(AddTaskDto updateTask, int id)
+        public async Task<ServiceResponse<GetTaskDto>> UpdateTask(AddTaskDto updateTask, int id)
         {
-            throw new NotImplementedException();
+            var response = new ServiceResponse<GetTaskDto>();
+
+            try
+            {
+                var task = await _context.Tasks.Include(task => task.User)
+                                               .Include(task => task.Board)
+                                               .Include(task => task.Column)
+                                               .FirstOrDefaultAsync(task => task.User!.Id == _helper.GetActiveUser() && task.Id == id);
+
+                if (task is null)
+                    throw new Exception($"Task with the given id: {id} Not Found!");
+
+                var updatedTask = _mapper.Map<BoardTask>(updateTask);
+                updatedTask.Board = task.Board;
+                updatedTask.Column = task.Column;
+
+                 _context.Tasks.Update(updatedTask);
+                await _context.SaveChangesAsync();
+
+                response.Data = _mapper.Map<GetTaskDto>(updatedTask);
+            }
+            catch (Exception ex)
+            {
+                _helper.SetHttpErrorResponse(response, ex.Message);
+            }
+
+            return response;
         }
     }
 }

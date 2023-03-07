@@ -20,7 +20,8 @@ namespace TaskManagement.Services.ColumnService
 
             try
             {
-                var board = await _context.Boards.Include(b => b.User).FirstOrDefaultAsync(b => b.Id == newColumn.BoardId && b.User!.Id == _helper.GetActiveUser());
+                var board = await _context.Boards.Include(b => b.User)
+                                                 .FirstOrDefaultAsync(b => b.Id == newColumn.BoardId && b.User!.Id == _helper.GetActiveUser());
 
                 var isColumn = await _context.Columns
                     .Include(c => c.Board)
@@ -46,8 +47,7 @@ namespace TaskManagement.Services.ColumnService
             }
             catch (Exception ex)
             {
-                response.Success = false;
-                response.Message = ex.Message;
+                _helper.SetHttpErrorResponse(response, ex.Message);
             }
 
             return response;
@@ -58,7 +58,8 @@ namespace TaskManagement.Services.ColumnService
             var response = new ServiceResponse<string>();
             try
             {
-                var isColumn = await _context.Columns.Include(col => col.User).FirstOrDefaultAsync(col => col.Id == id && col.User!.Id == _helper.GetActiveUser());
+                var isColumn = await _context.Columns.Include(col => col.User)
+                                                     .FirstOrDefaultAsync(col => col.Id == id && col.User!.Id == _helper.GetActiveUser());
 
                 if (isColumn is null)
                     throw new Exception($"Task with the given id: {id} Not Found!");
@@ -68,8 +69,7 @@ namespace TaskManagement.Services.ColumnService
             }
             catch (Exception ex)
             {
-                response.Success = false;
-                response.Message = ex.Message;
+                _helper.SetHttpErrorResponse(response, ex.Message);
             }
 
             return response;
@@ -79,8 +79,9 @@ namespace TaskManagement.Services.ColumnService
         {
             var response = new ServiceResponse<List<GetColumnDto>>
             {
-                Data = await _context.Columns.Include(col => col.Tasks).Where(col => col.User!.Id == _helper.GetActiveUser())
-                .Select(col => _mapper.Map<GetColumnDto>(col)).ToListAsync(),
+                Data = await _context.Columns.Include(col => col.Tasks)
+                                             .Where(col => col.User!.Id == _helper.GetActiveUser())
+                                             .Select(col => _mapper.Map<GetColumnDto>(col)).ToListAsync(),
             };
 
             return response;
@@ -92,7 +93,6 @@ namespace TaskManagement.Services.ColumnService
 
             try
             {
-
                 var column = await _context.Columns.Include(col => col.Tasks)
                                                    .SingleOrDefaultAsync(c => c.Id.Equals(id) && c.User!.Id == _helper.GetActiveUser());
 
@@ -104,8 +104,7 @@ namespace TaskManagement.Services.ColumnService
             }
             catch (Exception ex)
             {
-                response.Success = false;
-                response.Message = ex.Message;
+                _helper.SetHttpErrorResponse(response, ex.Message);
             }
 
             return response;
@@ -139,8 +138,7 @@ namespace TaskManagement.Services.ColumnService
             }
             catch (Exception ex)
             {
-                response.Success = false;
-                response.Message = ex.Message;
+                _helper.SetHttpErrorResponse(response, ex.Message);
             }
 
             return response;
