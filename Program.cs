@@ -1,27 +1,24 @@
-global using TaskManagement.DTOs.AuthDto;
+global using Microsoft.AspNetCore.Authentication.JwtBearer;
+global using Microsoft.AspNetCore.Authorization;
+global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.EntityFrameworkCore;
 global using System.Security.Claims;
 global using TaskManagement.Data;
-global using TaskManagement.Models;
-global using Microsoft.EntityFrameworkCore;
-global using TaskManagement.Services;
-global using Microsoft.AspNetCore.Mvc;
-global using TaskManagement.DTOs.UserDto;
-global using TaskManagement.DTOs.ColumnDto;
-global using Microsoft.AspNetCore.Authorization;
-global using Microsoft.AspNetCore.Authentication.JwtBearer;
+global using TaskManagement.DTOs.AuthDto;
 global using TaskManagement.DTOs.BoardDto;
+global using TaskManagement.DTOs.ColumnDto;
 global using TaskManagement.DTOs.SubTaskDto;
 global using TaskManagement.DTOs.TaskDto;
+global using TaskManagement.DTOs.UserDto;
+global using TaskManagement.Models;
+global using TaskManagement.Services;
 global using TaskManagement.Services.Helper;
-
-
 using Microsoft.IdentityModel.Tokens;
 using TaskManagement.Services.AuthService;
-using TaskManagement.Services.UserService;
 using TaskManagement.Services.BoardService;
 using TaskManagement.Services.ColumnService;
 using TaskManagement.Services.TaskService;
-using System.Text.Json.Serialization;
+using TaskManagement.Services.UserService;
 
 var builder = WebApplication.CreateBuilder(args);
 

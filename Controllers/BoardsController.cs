@@ -5,6 +5,7 @@ namespace TaskManagement.Controllers;
 [ApiController]
 [Route("api/v1/[controller]")]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+
 public class BoardsController : ControllerBase
 {
     private readonly IBoardService _boardService;
@@ -36,7 +37,7 @@ public class BoardsController : ControllerBase
     {
         var response = await _boardService.GetBoard(id);
 
-        if (response is null)
+        if (!response.Success)
             return NotFound(response);
 
         return Ok(response);
@@ -47,7 +48,7 @@ public class BoardsController : ControllerBase
     {
         var response = await _boardService.UpdateBoard(board, id);
 
-        if (response is null)
+        if (!response.Success)
             return NotFound(response);
 
         return Ok(response);
@@ -58,9 +59,9 @@ public class BoardsController : ControllerBase
     {
         var response = await _boardService.DeleteBoard(id);
 
-        if (response is null)
+        if (!response.Success)
             return NotFound(response);
 
-        return Ok(response);
+        return NoContent();
     }
 }
